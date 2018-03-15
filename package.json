@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy-config.js",
     "build": "ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
@@ -21,7 +21,15 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
+    "apollo-angular": "^1.0.1",
+    "apollo-angular-link-http": "^1.0.2-beta.0",
+    "apollo-cache-inmemory": "^1.1.9",
+    "apollo-client": "^2.2.5",
+    "apollo-link-context": "^1.0.7",
+    "apollo-link-http": "^1.5.2",
     "core-js": "^2.4.1",
+    "graphql": "^0.13.1",
+    "graphql-tag": "^2.8.0",
     "rxjs": "^5.5.6",
     "zone.js": "^0.8.19"
   },
@@ -29,6 +37,7 @@
     "@angular/cli": "~1.7.1",
     "@angular/compiler-cli": "^5.2.0",
     "@angular/language-service": "^5.2.0",
+    "karma": "^2.0.0",
     "typescript": "~2.5.3"
   }
 }
