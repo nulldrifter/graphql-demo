@@ -1,31 +1,83 @@
 import { Component } from '@angular/core';
+import { Apollo } from 'apollo-angular';
+import gql from 'graphql-tag'; // passes queries into apollo-client
 
 @Component({
   selector: 'app-root',
-  template: `
-    <!--The content below is only a placeholder and can be replaced.-->
-    <div style="text-align:center">
-      <h1>
-        Welcome to {{title}}!
-      </h1>
-      <img width="300" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-    </div>
-    <h2>Here are some links to help you start: </h2>
-    <ul>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-      </li>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-      </li>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-      </li>
-    </ul>
-    
-  `,
-  styles: []
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
 })
+
 export class AppComponent {
   title = 'app';
+  loading = false;
+  objectKeys = Object.keys; // make this available to our template for easy obj iteration
+  films: any;
+  activeCharacterID: string;
+  activeCharacterBio: any;
+  public data: any;
+  public cachedData: any;
+
+  /**
+   * Fetches and displays character info for a single person
+   * @param characterURL (String) - the character's its SWAPI people URL
+   */
+  showCharBio(characterURL) {
+    this.loading = true;
+
+    // extract the character's ID
+    const id = characterURL.match(/\D+(\d{1,2})\/$/)[1] // https://swapi.co/api/people/20/  => 20
+    this.activeCharacterID = id
+
+    // get the character's bio
+    // TODO: pass in vars instead of inlining them
+    this.apollo.query({
+      query: gql`
+      query ($id: String = "${id}") {
+        people_one(id: $id) {
+          name
+          gender
+          height
+          mass
+          skin_color
+          birth_year
+          eye_color
+          hair_color
+        }
+      }
+    `
+    }).subscribe((res:any) => {
+      const { data, loading } = res;
+      this.activeCharacterBio = data.people_one;
+      this.loading = loading;
+    })
+  };
+
+  // TODO: sort films by episode_id
+  // TODO: sort characters by films.appearance.length() DESC
+  private queryAllFilms: string = gql`
+  {
+    films {
+      title,
+      episode_id
+      characters {
+        name
+        url
+      }
+    }
+  }
+  `;
+
+  // get all films and update cache
+  constructor(private apollo: Apollo) {
+    apollo.watchQuery<any>({ query: this.queryAllFilms }).valueChanges.subscribe(({ data }) => {
+      this.data = data;
+      this.films = data.films;
+      this.readQuery();
+    });
+  }
+
+  readQuery() {
+    this.cachedData = this.apollo.getClient().readQuery({ query: this.queryAllFilms });
+  }
 }
