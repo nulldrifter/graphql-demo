@@ -1,0 +1,11 @@
+.faded {
+  opacity: .3;
+}
+
+tbody th {
+  text-align: right;
+}
+
+li {
+  cursor: pointer;
+}

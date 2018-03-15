@@ -1,0 +1,39 @@
+<!-- Character Info -->
+<div [hidden]="!activeCharacterID" [class.faded]="loading">
+  <div class="char-bio" *ngIf="activeCharacterBio">
+    <table>
+      <thead>
+        <tr>
+          <th colspan="2">{{activeCharacterBio.name}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let key of objectKeys(activeCharacterBio)">
+          <template *ngIf="!key.startsWith('__'); then info"></template>
+          <ng-template #info>
+            <th>{{key}}</th>
+            <td>{{activeCharacterBio[key]}}</td>
+          </ng-template>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Film List -->
+<div *ngFor="let film of films">
+  <h2>Episode {{film.episode_id}}: {{film.title}}</h2>
+  <ul *ngFor="let character of film.characters">
+    <li>
+      <a (click)="showCharBio(character.url)">{{character.name}}</a>
+    </li>
+  </ul>
+</div>
+
+<!-- GraphQL response -->
+<h1>Query Response</h1>
+<pre>{{data|json}}</pre>
+
+<!-- cache response -->
+<h1>Cached Data</h1>
+<pre>{{cachedData|json}}</pre>
