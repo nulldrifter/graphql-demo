@@ -1,6 +1,6 @@
 <!-- Character Info -->
-<div [hidden]="!activeCharacterID" [class.faded]="loading">
-  <div class="char-bio" *ngIf="activeCharacterBio">
+<div [hidden]="!activeCharacterID" [class.faded]="loading" class="char-bio">
+  <div *ngIf="activeCharacterBio">
     <table>
       <thead>
         <tr>
