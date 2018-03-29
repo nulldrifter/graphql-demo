@@ -4,7 +4,7 @@
     <table>
       <thead>
         <tr>
-          <th colspan="2">{{activeCharacterBio.name}}</th>
+          <th colspan="2">{{activeCharacterBio['name']}}</th>
         </tr>
       </thead>
       <tbody>
@@ -23,8 +23,8 @@
 <!-- Film List -->
 <div *ngFor="let film of films">
   <h2>Episode {{film.episode_id}}: {{film.title}}</h2>
-  <ul *ngFor="let character of film.characters">
-    <li>
+  <ul>
+    <li *ngFor="let character of film.characters">
       <a (click)="showCharBio(character.url)">{{character.name}}</a>
     </li>
   </ul>
