@@ -21,5 +21,5 @@ _Spin up the PoC_
 * [apollo-angular](https://github.com/apollographql/apollo-angular)
 
 ## Authors
-* Adam Clark
+* [Adam Clark](https://github.com/adamclerk)
 * [Josh Davidson](https://github.com/yharnam)
