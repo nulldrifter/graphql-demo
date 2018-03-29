@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag'; // passes queries into apollo-client
 
@@ -8,15 +8,15 @@ import gql from 'graphql-tag'; // passes queries into apollo-client
   styleUrls: ['./app.component.css']
 })
 
-export class AppComponent {
-  title = 'app';
-  loading = false;
+export class AppComponent implements OnInit {
+  title:string = 'app';
+  loading:boolean = false;
   objectKeys = Object.keys; // make this available to our template for easy obj iteration
   films: any;
   activeCharacterID: string;
-  activeCharacterBio: any;
-  public data: any;
-  public cachedData: any;
+  activeCharacterBio: Object;
+  data: Object[];
+  cachedData: Object[];
 
   /**
    * Fetches and displays character info for a single person
@@ -46,15 +46,12 @@ export class AppComponent {
         }
       }
     `
-    }).subscribe((res:any) => {
-      const { data, loading } = res;
-      this.activeCharacterBio = data.people_one;
+    }).subscribe(({data, loading}) => {
+      this.activeCharacterBio = data['people_one'];
       this.loading = loading;
     })
   };
 
-  // TODO: sort films by episode_id
-  // TODO: sort characters by films.appearance.length() DESC
   private queryAllFilms: string = gql`
   {
     films {
@@ -68,16 +65,33 @@ export class AppComponent {
   }
   `;
 
-  // get all films and update cache
   constructor(private apollo: Apollo) {
-    apollo.watchQuery<any>({ query: this.queryAllFilms }).valueChanges.subscribe(({ data }) => {
-      this.data = data;
-      this.films = data.films;
-      this.readQuery();
-    });
   }
 
   readQuery() {
     this.cachedData = this.apollo.getClient().readQuery({ query: this.queryAllFilms });
+  }
+
+  ngOnInit() {
+    // get all films and update cache
+    this.apollo
+      .watchQuery<any>({ query: this.queryAllFilms })
+      .valueChanges.subscribe(({ data }) => {
+      this.data = data;
+      this.films = Array.from(data.films)
+        .sort((a, b) => {
+          const film1: any = a,
+            film2: any = b;
+          return film1.episode_id - film2.episode_id;
+        });
+
+      // TODO: rm this; for demo ONLY
+      let x = 0, y = 4;
+      this.films[x] = this.films.splice(y, 1, this.films[x])[0];
+      x = 1, y = 5;
+      this.films[x] = this.films.splice(y, 1, this.films[x])[0];
+
+      this.readQuery();
+    });
   }
 }
