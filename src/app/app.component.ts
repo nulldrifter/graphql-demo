@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag'; // passes queries into apollo-client
 
+import { Character, CharacterBio } from '../../model/character.interface';
+import Film from '../../model/film.interface';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -9,12 +12,12 @@ import gql from 'graphql-tag'; // passes queries into apollo-client
 })
 
 export class AppComponent implements OnInit {
-  title:string = 'app';
-  loading:boolean = false;
+  title = 'app';
+  loading = false;
   objectKeys = Object.keys; // make this available to our template for easy obj iteration
-  films: any;
+  films: Film[];
   activeCharacterID: string;
-  activeCharacterBio: Object;
+  activeCharacterBio: Character;
   data: Object[];
   cachedData: Object[];
 
@@ -77,21 +80,22 @@ export class AppComponent implements OnInit {
     this.apollo
       .watchQuery<any>({ query: this.queryAllFilms })
       .valueChanges.subscribe(({ data }) => {
-      this.data = data;
-      this.films = Array.from(data.films)
-        .sort((a, b) => {
-          const film1: any = a,
-            film2: any = b;
-          return film1.episode_id - film2.episode_id;
-        });
+        this.data = data;
+        
+        this.films = <Film[]>Array.from(data.films)
+          .sort((a, b) => {
+            const film1: any = a,
+              film2: any = b;
+            return film1.episode_id - film2.episode_id;
+          });
 
-      // TODO: rm this; for demo ONLY
-      let x = 0, y = 4;
-      this.films[x] = this.films.splice(y, 1, this.films[x])[0];
-      x = 1, y = 5;
-      this.films[x] = this.films.splice(y, 1, this.films[x])[0];
+        // TODO: rm this; for demo ONLY
+        let x = 0, y = 4;
+        this.films[x] = this.films.splice(y, 1, this.films[x])[0];
+        x = 1, y = 5;
+        this.films[x] = this.films.splice(y, 1, this.films[x])[0];
 
-      this.readQuery();
-    });
+        this.readQuery();
+      });
   }
 }
